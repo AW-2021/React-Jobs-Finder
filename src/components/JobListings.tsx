@@ -1,23 +1,23 @@
 import JobListing from "./JobListing";
 import Spinner from "./Spinner";
 import { useState, useEffect } from "react";
+import { type Job } from "../lib/types";
+import { supabase } from "../supabase-client";
 
 const JobListings = ({ isHome = false }) => {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchJobs = async () => {
-      const apiUrl = isHome
-        ? "/api/jobs?_limit=3"
-        : "/api/jobs";
-
       try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-        setJobs(data);
-      } catch (error) {
-        console.log("Error", error);
+        const { error, data } = await supabase
+          .from("jobs")
+          .select("*")
+          .order("created_at", { ascending: true });
+        setJobs(data ?? []);
+      } catch (err: any) {
+        console.error("Error reading jobs", err.message);
       } finally {
         setLoading(false);
       }
