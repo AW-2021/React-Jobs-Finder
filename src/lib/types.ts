@@ -6,5 +6,13 @@ export interface Job {
   location: string;
   salary: string;
   created_at?: string;
-  company_id: number;
+}
+
+export interface Company {
+  id?: number;
+  name: string;
+  description?: string;
+  contact_email: string;
+  contact_phone?: string;
+  created_at?: string;
 }

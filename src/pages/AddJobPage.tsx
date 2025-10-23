@@ -1,40 +1,72 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 //import { toast } from "react-toastify";
 import { supabase } from "../supabase-client";
-import { type Job } from "../lib/types";
+import { type Job, type Company } from "../lib/types";
 
 const initialJob = {
-    title: "",
-    type: "Full-Time",
-    description: "",
-    salary: "Under $50K",
-    location: "",
-    company_id: 1,
-  };
+  title: "",
+  type: "Full-Time",
+  description: "",
+  salary: "Under $50K",
+  location: "",
+};
+
+const initialCompany = {
+  name: "",
+  description: "",
+  contact_email: "",
+  contact_phone: "",
+};
 
 const AddJobPage = () => {
-  const [companyName, setCompanyName] = useState("");
-  const [companyDesc, setCompanyDesc] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
+  const companies: Company[] = useLoaderData();
 
   const [newJob, setNewJob] = useState<Job>(initialJob);
 
+  const [newCompany, setNewCompany] = useState<Company>(initialCompany);
+  const [isCompanyNew, setIsCompanyNew] = useState<boolean>(false);
+  const [companyId, setCompanyId] = useState<number | undefined>(undefined);
+
   const navigate = useNavigate();
+
+  const activeBtnStyle =
+    "bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1.5 px-4 w-full focus:outline-none focus:shadow-outline";
+  const btnStyle =
+    "bg-white border-2 border-indigo-500 hover:bg-indigo-600 hover:text-white text-black font-bold py-1.5 px-4 w-full focus:outline-none focus:shadow-outline";
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const { error } = await supabase.from("jobs").insert(newJob).single();
-    // const { error } = await supabase.from("companies").insert(newJob).single();
+    let company_id = companyId;
 
-    if (error) {
-      console.error("Error adding new job: ", error.message);
+    if (isCompanyNew) {
+      const { data, error: companiesError } = await supabase
+        .from("companies")
+        .insert(newCompany)
+        .select()
+        .single();
+
+      if (companiesError) {
+        console.error("Error adding new company: ", companiesError.message);
+        return;
+      }
+      company_id = data.id;
+    }
+
+    const { error: jobsError } = await supabase
+      .from("jobs")
+      .insert({ ...newJob, company_id })
+      .single();
+
+    if (jobsError) {
+      console.error("Error adding new job: ", jobsError.message);
       return;
     }
 
     setNewJob(initialJob);
+    setNewCompany(initialCompany);
+    setCompanyId(undefined);
 
     //toast.success('Job Added Successfully!');
     return navigate("/jobs");
@@ -169,81 +201,150 @@ const AddJobPage = () => {
 
             <h3 className="text-2xl mb-5">Company Info</h3>
 
-            <div className="mb-4">
-              <label
-                htmlFor="company"
-                className="block text-gray-700 font-bold mb-2"
+            <div className="flex rounded-full mb-4">
+              <button
+                type="button"
+                className={`${
+                  isCompanyNew ? activeBtnStyle : btnStyle
+                } rounded-l-full border-r-0`}
+                onClick={() => setIsCompanyNew((prev) => !prev)}
               >
-                Company Name
-              </label>
-              <input
-                type="text"
-                id="company"
-                name="company"
-                required
-                className="border border-gray-200 rounded w-full px-3 py-2"
-                placeholder="Company Name"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
+                New Company
+              </button>
+
+              <button
+                type="button"
+                className={`${
+                  isCompanyNew ? btnStyle : activeBtnStyle
+                } rounded-r-full border-l-0`}
+                onClick={() => setIsCompanyNew((prev) => !prev)}
+              >
+                Existing Company
+              </button>
             </div>
 
-            <div className="mb-4">
-              <label
-                htmlFor="company_description"
-                className="block text-gray-700 font-bold mb-2"
-              >
-                Company Description
-              </label>
-              <textarea
-                id="company_description"
-                name="company_description"
-                className="border border-gray-200 rounded w-full py-2 px-3"
-                rows={4}
-                placeholder="What does your company do?"
-                value={companyDesc}
-                onChange={(e) => setCompanyDesc(e.target.value)}
-              ></textarea>
-            </div>
+            {isCompanyNew ? (
+              <>
+                <div className="mb-4">
+                  <label
+                    htmlFor="new_company"
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    id="new_company"
+                    name="new_company"
+                    required
+                    className="border border-gray-200 rounded w-full px-3 py-2"
+                    placeholder="Company Name"
+                    value={newCompany.name}
+                    onChange={(e) =>
+                      setNewCompany((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
 
-            <div className="mb-4">
-              <label
-                htmlFor="contact_email"
-                className="block text-gray-700 font-bold mb-2"
-              >
-                Contact Email
-              </label>
-              <input
-                type="email"
-                id="contact_email"
-                name="contact_email"
-                className="border border-gray-200 rounded w-full px-3 py-2"
-                placeholder="Email address for applicants"
-                required
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-              />
-            </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="company_description"
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Company Description
+                  </label>
+                  <textarea
+                    id="company_description"
+                    name="company_description"
+                    className="border border-gray-200 rounded w-full py-2 px-3"
+                    rows={4}
+                    placeholder="What does your company do?"
+                    value={newCompany.description}
+                    onChange={(e) =>
+                      setNewCompany((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                  ></textarea>
+                </div>
 
-            <div className="mb-4">
-              <label
-                htmlFor="contact_phone"
-                className="block text-gray-700 font-bold mb-2"
-              >
-                Contact Phone
-              </label>
-              <input
-                type="tel"
-                id="contact_phone"
-                name="contact_phone"
-                className="border border-gray-200 rounded w-full px-3 py-2"
-                placeholder="Optional phone for applicants"
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
-              />
-            </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="contact_email"
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Contact Email
+                  </label>
+                  <input
+                    type="email"
+                    id="contact_email"
+                    name="contact_email"
+                    className="border border-gray-200 rounded w-full px-3 py-2"
+                    placeholder="Email address for applicants"
+                    required
+                    value={newCompany.contact_email}
+                    onChange={(e) =>
+                      setNewCompany((prev) => ({
+                        ...prev,
+                        contact_email: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
 
-            <div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="contact_phone"
+                    className="block text-gray-700 font-bold mb-2"
+                  >
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    id="contact_phone"
+                    name="contact_phone"
+                    className="border border-gray-200 rounded w-full px-3 py-2"
+                    placeholder="Optional phone for applicants"
+                    value={newCompany.contact_phone}
+                    onChange={(e) =>
+                      setNewCompany((prev) => ({
+                        ...prev,
+                        contact_phone: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="mb-4">
+                <label
+                  htmlFor="old_company"
+                  className="block text-gray-700 font-bold mb-2"
+                >
+                  Company Name
+                </label>
+                <select
+                  id="old_company"
+                  name="old_company"
+                  required
+                  className="border border-gray-200 rounded w-full py-2 px-3"
+                  value={companyId}
+                  onChange={(e) => setCompanyId(Number(e.target.value))}
+                >
+                  {companies.map((company) => (
+                    <option key={company.id} value={company.id}>
+                      {company.id}. {company.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="mt-7">
               <button
                 className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
                 type="submit"
@@ -258,4 +359,17 @@ const AddJobPage = () => {
   );
 };
 
-export default AddJobPage;
+const companiesLoader = async () => {
+  const { error, data } = await supabase
+    .from("companies")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching companies: ", error.message);
+    return null;
+  }
+  return data;
+};
+
+export { AddJobPage as default, companiesLoader };
