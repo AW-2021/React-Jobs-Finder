@@ -1,6 +1,6 @@
 import { useParams, useLoaderData, Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaMapMarker } from "react-icons/fa";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { supabase } from "../supabase-client";
 
 const JobPage = () => {
@@ -19,7 +19,8 @@ const JobPage = () => {
       console.error("Error deleting job: ", error.message);
       return;
     }
-    //toast.success('Job Deleted Successfully.');
+    
+    toast.success('Job Deleted Successfully.');
     navigate("/jobs");
   };
 

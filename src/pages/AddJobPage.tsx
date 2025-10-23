@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
-//import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { supabase } from "../supabase-client";
 import { type Job, type Company } from "../lib/types";
 
@@ -68,7 +68,7 @@ const AddJobPage = () => {
     setNewCompany(initialCompany);
     setCompanyId(undefined);
 
-    //toast.success('Job Added Successfully!');
+    toast.success('Job Added Successfully!');
     return navigate("/jobs");
   };
 
