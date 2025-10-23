@@ -16,7 +16,7 @@ const Navbar = () => {
         <div className='flex h-20 items-center justify-between'>
           <div className='flex flex-1 items-center justify-center md:items-stretch md:justify-start'>
             {/* LOGO */}
-            <Link to='/' className='flex flex-shrink-0 items-center mr-4'>
+            <Link to='/' className='flex shrink-0 items-center mr-4'>
               <img 
                 src={logo} 
                 alt="React Jobs logo"

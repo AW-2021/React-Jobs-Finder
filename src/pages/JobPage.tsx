@@ -7,16 +7,19 @@ const JobPage = () => {
   const job = useLoaderData();
   const navigate = useNavigate();
 
-  const onDeleteClick = (jobId: number) => {
+  const onDeleteClick = async (jobId: number) => {
     const confirm = window.confirm(
       "Are you sure you want to delete this listing?"
     );
-
     if (!confirm) return;
 
-    //deleteJob(jobId);
-    //toast.success('Job Deleted Successfully.');
+    const { error } = await supabase.from("jobs").delete().eq("id", jobId)
 
+    if (error) {
+      console.error("Error deleting job: ", error.message);
+      return;
+    }
+    //toast.success('Job Deleted Successfully.');
     navigate("/jobs");
   };
 
