@@ -1,10 +1,10 @@
 export interface Job {
-  id: number;
+  id?: number;
   title: string;
   type: string;
   description?: string;
   location: string;
   salary: string;
-  created_at: string;
+  created_at?: string;
   company_id: number;
 }

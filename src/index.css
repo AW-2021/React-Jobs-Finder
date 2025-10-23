@@ -3,3 +3,12 @@
 @theme {
   --font-sans: Roboto, sans-serif;
 }
+
+button {
+  cursor: pointer;
+}
+@layer utilities {
+  input::placeholder, textarea::placeholder {
+    @apply text-gray-400
+  }
+}
