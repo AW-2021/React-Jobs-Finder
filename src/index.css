@@ -7,8 +7,13 @@
 button {
   cursor: pointer;
 }
+
 @layer utilities {
   input::placeholder, textarea::placeholder {
     @apply text-gray-400
+  }
+
+  input, textarea, select {
+    @apply border border-gray-200
   }
 }

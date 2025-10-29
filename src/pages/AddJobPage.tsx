@@ -89,7 +89,7 @@ const AddJobPage = () => {
               <select
                 id="type"
                 name="type"
-                className="border border-gray-200 rounded w-full py-2 px-3"
+                className="rounded w-full py-2 px-3"
                 required
                 value={newJob.type}
                 onChange={(e) =>
@@ -114,7 +114,7 @@ const AddJobPage = () => {
                 type="text"
                 id="title"
                 name="title"
-                className="border border-gray-200 rounded w-full py-2 px-3 mb-2"
+                className="rounded w-full py-2 px-3 mb-2"
                 placeholder="eg. Full-Stack Web Developer"
                 required
                 value={newJob.title}
@@ -134,7 +134,7 @@ const AddJobPage = () => {
               <textarea
                 id="description"
                 name="description"
-                className="border border-gray-200 rounded w-full py-2 px-3"
+                className="rounded w-full py-2 px-3"
                 rows={4}
                 placeholder="Add any job duties, expectations, requirements, etc."
                 value={newJob.description}
@@ -157,7 +157,7 @@ const AddJobPage = () => {
               <select
                 id="salary"
                 name="salary"
-                className="border border-gray-200 rounded w-full py-2 px-3"
+                className="rounded w-full py-2 px-3"
                 required
                 value={newJob.salary}
                 onChange={(e) =>
@@ -189,7 +189,7 @@ const AddJobPage = () => {
                 type="text"
                 id="location"
                 name="location"
-                className="border border-gray-200 rounded w-full px-3 py-2 mb-2"
+                className="rounded w-full px-3 py-2 mb-2"
                 placeholder="Company Location"
                 required
                 value={newJob.location}
@@ -237,7 +237,7 @@ const AddJobPage = () => {
                     id="new_company"
                     name="new_company"
                     required
-                    className="border border-gray-200 rounded w-full px-3 py-2"
+                    className="rounded w-full px-3 py-2"
                     placeholder="Company Name"
                     value={newCompany.name}
                     onChange={(e) =>
@@ -259,7 +259,7 @@ const AddJobPage = () => {
                   <textarea
                     id="company_description"
                     name="company_description"
-                    className="border border-gray-200 rounded w-full py-2 px-3"
+                    className="rounded w-full py-2 px-3"
                     rows={4}
                     placeholder="What does your company do?"
                     value={newCompany.description}
@@ -283,7 +283,7 @@ const AddJobPage = () => {
                     type="email"
                     id="contact_email"
                     name="contact_email"
-                    className="border border-gray-200 rounded w-full px-3 py-2"
+                    className="rounded w-full px-3 py-2"
                     placeholder="Email address for applicants"
                     required
                     value={newCompany.contact_email}
@@ -307,7 +307,7 @@ const AddJobPage = () => {
                     type="tel"
                     id="contact_phone"
                     name="contact_phone"
-                    className="border border-gray-200 rounded w-full px-3 py-2"
+                    className="rounded w-full px-3 py-2"
                     placeholder="Optional phone for applicants"
                     value={newCompany.contact_phone}
                     onChange={(e) =>
@@ -331,7 +331,7 @@ const AddJobPage = () => {
                   id="old_company"
                   name="old_company"
                   required
-                  className="border border-gray-200 rounded w-full py-2 px-3"
+                  className="rounded w-full py-2 px-3"
                   value={companyId}
                   onChange={(e) => setCompanyId(Number(e.target.value))}
                 >
