@@ -205,21 +205,21 @@ const AddJobPage = () => {
               <button
                 type="button"
                 className={`${
-                  isCompanyNew ? activeBtnStyle : btnStyle
+                  isCompanyNew ? btnStyle : activeBtnStyle
                 } rounded-l-full border-r-0`}
                 onClick={() => setIsCompanyNew((prev) => !prev)}
               >
-                New Company
+                Existing Company
               </button>
 
               <button
                 type="button"
                 className={`${
-                  isCompanyNew ? btnStyle : activeBtnStyle
+                  isCompanyNew ? activeBtnStyle : btnStyle
                 } rounded-r-full border-l-0`}
                 onClick={() => setIsCompanyNew((prev) => !prev)}
               >
-                Existing Company
+                New Company
               </button>
             </div>
 

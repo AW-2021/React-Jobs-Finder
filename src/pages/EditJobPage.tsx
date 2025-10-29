@@ -1,49 +1,46 @@
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { type Job } from "../lib/types";
+import { type Company, type Job } from "../lib/types";
 import { supabase } from "../supabase-client";
 
 const EditJobPage = () => {
   const job = useLoaderData();
 
-  const [title, setTitle] = useState(job.title);
-  const [type, setType] = useState(job.type);
-  const [description, setDescription] = useState(job.description);
-  const [salary, setSalary] = useState(job.salary);
-  const [location, setLocation] = useState(job.location);
-  const [companyName, setCompanyName] = useState(job.companies.name);
-  const [companyDesc, setCompanyDesc] = useState(job.companies.description);
-  const [contactEmail, setContactEmail] = useState(job.companies.contact_email);
-  const [contactPhone, setContactPhone] = useState(job.companies.contact_phone);
+  const [updatedJob, setUpdatedJob] = useState<Job>({
+    title: job.title,
+    type: job.type,
+    description: job.description,
+    salary: job.salary,
+    location: job.location,
+  });
+
+  const [updatedCompany, setUpdatedCompany] = useState<Company>({
+    name: job.companies.name,
+    description: job.companies.description,
+    contact_email: job.companies.contact_email,
+    contact_phone: job.companies.contact_phone,
+  });
 
   const navigate = useNavigate();
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const updatedJob = {
-      title,
-      type,
-      location,
-      description,
-      salary,
-    };
-    const updatedCompany = {
-      name: companyName,
-      description: companyDesc,
-      contact_email: contactEmail,
-      contact_phone: contactPhone,
-    };
+    const { error: companyError } = await supabase
+      .from("companies")
+      .update(updatedCompany)
+      .eq("id", job.companies.id);
 
-    const { error: companyError } = await supabase.from("companies").update(updatedCompany).eq("id", job.companies.id);
-    
     if (companyError) {
       console.error("Error updating company ", companyError.message);
       return;
     }
 
-    const { error: jobError } = await supabase.from("jobs").update(updatedJob).eq("id", job.id);
+    const { error: jobError } = await supabase
+      .from("jobs")
+      .update(updatedJob)
+      .eq("id", job.id);
 
     if (jobError) {
       console.error("Error updating job ", jobError.message);
@@ -76,8 +73,10 @@ const EditJobPage = () => {
                 name="type"
                 className="border rounded w-full py-2 px-3"
                 required
-                value={type}
-                onChange={(e) => setType(e.target.value)}
+                value={updatedJob.type}
+                onChange={(e) =>
+                  setUpdatedJob((prev) => ({ ...prev, type: e.target.value }))
+                }
               >
                 <option value="Full-Time">Full-Time</option>
                 <option value="Part-Time">Part-Time</option>
@@ -100,8 +99,10 @@ const EditJobPage = () => {
                 className="border rounded w-full py-2 px-3 mb-2"
                 placeholder="eg. Full-Stack Web Developer"
                 required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={updatedJob.title}
+                onChange={(e) =>
+                  setUpdatedJob((prev) => ({ ...prev, title: e.target.value }))
+                }
               />
             </div>
 
@@ -118,8 +119,13 @@ const EditJobPage = () => {
                 className="border rounded w-full py-2 px-3"
                 rows={4}
                 placeholder="Add any job duties, expectations, requirements, etc."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={updatedJob.description}
+                onChange={(e) =>
+                  setUpdatedJob((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
               ></textarea>
             </div>
 
@@ -135,8 +141,10 @@ const EditJobPage = () => {
                 name="salary"
                 className="border rounded w-full py-2 px-3"
                 required
-                value={salary}
-                onChange={(e) => setSalary(e.target.value)}
+                value={updatedJob.salary}
+                onChange={(e) =>
+                  setUpdatedJob((prev) => ({ ...prev, salary: e.target.value }))
+                }
               >
                 <option value="Under $50K">Under $50K</option>
                 <option value="$50K - 60K">$50K - $60K</option>
@@ -166,8 +174,13 @@ const EditJobPage = () => {
                 className="border rounded w-full px-3 py-2 mb-2"
                 placeholder="Company Location"
                 required
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                value={updatedJob.location}
+                onChange={(e) =>
+                  setUpdatedJob((prev) => ({
+                    ...prev,
+                    location: e.target.value,
+                  }))
+                }
               />
             </div>
 
@@ -186,8 +199,13 @@ const EditJobPage = () => {
                 name="company"
                 className="border rounded w-full px-3 py-2"
                 placeholder="Company Name"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
+                value={updatedCompany.name}
+                onChange={(e) =>
+                  setUpdatedCompany((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
               />
             </div>
 
@@ -204,8 +222,13 @@ const EditJobPage = () => {
                 className="border rounded w-full py-2 px-3"
                 rows={4}
                 placeholder="What does your company do?"
-                value={companyDesc}
-                onChange={(e) => setCompanyDesc(e.target.value)}
+                value={updatedCompany.description}
+                onChange={(e) =>
+                  setUpdatedCompany((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
               ></textarea>
             </div>
 
@@ -223,8 +246,13 @@ const EditJobPage = () => {
                 className="border rounded w-full px-3 py-2"
                 placeholder="Email address for applicants"
                 required
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
+                value={updatedCompany.contact_email}
+                onChange={(e) =>
+                  setUpdatedCompany((prev) => ({
+                    ...prev,
+                    contact_email: e.target.value,
+                  }))
+                }
               />
             </div>
 
@@ -241,8 +269,13 @@ const EditJobPage = () => {
                 name="contact_phone"
                 className="border rounded w-full px-3 py-2"
                 placeholder="Optional phone for applicants"
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
+                value={updatedCompany.contact_phone}
+                onChange={(e) =>
+                  setUpdatedCompany((prev) => ({
+                    ...prev,
+                    contact_phone: e.target.value,
+                  }))
+                }
               />
             </div>
 

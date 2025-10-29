@@ -3,8 +3,8 @@ export interface Job {
   title: string;
   type: string;
   description?: string;
-  location: string;
   salary: string;
+  location: string;
   created_at?: string;
 }
 
