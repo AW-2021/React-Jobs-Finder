@@ -335,7 +335,7 @@ const AddJobPage = () => {
                   value={companyId}
                   onChange={(e) => setCompanyId(Number(e.target.value))}
                 >
-                  {companies.map((company) => (
+                  {companies?.map((company) => (
                     <option key={company.id} value={company.id}>
                       {company.id}. {company.name}
                     </option>
