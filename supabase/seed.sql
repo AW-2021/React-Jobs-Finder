@@ -1,0 +1,20 @@
+-- Seed data for companies and jobs tables
+-- This file populates the database with sample data for local development
+
+-- Insert companies first (since jobs references companies)
+INSERT INTO public.companies (name, description, contact_email, contact_phone) VALUES
+('NewTek Solutions', 'NewTek Solutions is a leading technology company specializing in web development and digital solutions. We pride ourselves on delivering high-quality products and services to our clients while fostering a collaborative and innovative work environment.', 'contact@teksolutions.com', '555-555-5555'),
+('Veneer Solutions', 'Veneer Solutions is a creative agency specializing in digital design and development. Our team is dedicated to pushing the boundaries of creativity and innovation to deliver exceptional results for our clients.', 'contact@veneersol.com', '444-444-4444'),
+('Dolor Cloud', 'Dolor Cloud is a leading technology company specializing in digital solutions for businesses of all sizes. With a focus on innovation and customer satisfaction, we are committed to delivering cutting-edge products and services.', 'contact@dolorcloud.com', '333-333-3333'),
+('Alpha Elite', 'Alpha Elite is a dynamic startup specializing in digital marketing and web development. We are committed to fostering a diverse and inclusive workplace where creativity and innovation thrive.', 'contact@alphaelite.com', '222-222-2222'),
+('Browning Technologies', 'Browning Technologies is a rapidly growing technology company specializing in e-commerce solutions. We offer a dynamic and collaborative work environment where employees are encouraged to think creatively and innovate.', 'contact@browningtech.com', '111-111-1111'),
+('Port Solutions INC', 'Port Solutions is a leading technology company specializing in software development and digital marketing. We are committed to providing our clients with cutting-edge solutions and our employees with a supportive and rewarding work environment.', 'contact@portsolutions.com', '777-777-7777');
+
+-- Insert jobs (company_id references the auto-generated IDs from companies table)
+INSERT INTO public.jobs (title, type, description, salary, location, company_id) VALUES
+('Senior React Developer', 'Full-Time', 'We are seeking a talented Front-End Developer to join our team in Boston, MA. The ideal candidate will have strong skills in HTML, CSS, and JavaScript, with experience working with modern JavaScript frameworks such as React or Angular.', '$70K - $80K', 'Boston, MA', 1),
+('Front-End Engineer (React & Redux)', 'Full-Time', 'Join our team as a Front-End Developer in sunny Miami, FL. We are looking for a motivated individual with a passion for crafting beautiful and responsive web applications. Experience with UI/UX design principles and a strong attention to detail are highly desirable.', '$70K - $80K', 'Miami, FL', 2),
+('React.js Dev', 'Full-Time', 'Are you passionate about front-end development? Join our team in vibrant Brooklyn, NY, and work on exciting projects that make a difference. We offer competitive compensation and a collaborative work environment where your ideas are valued.', '$70K - $80K', 'Brooklyn, NY', 3),
+('React Front-End Developer', 'Part-Time', 'Join our team as a Part-Time Front-End Developer in beautiful Pheonix, AZ. We are looking for a self-motivated individual with a passion for creating engaging user experiences. This position offers flexible hours and the opportunity to work remotely.', '$60K - $70K', 'Pheonix, AZ', 4),
+('Full Stack React Developer', 'Full-Time', 'Exciting opportunity for a Full-Time Front-End Developer in bustling Atlanta, GA. We are seeking a talented individual with a passion for building elegant and scalable web applications. Join our team and make an impact!', '$90K - $100K', 'Atlanta, GA', 5),
+('React Native Developer', 'Full-Time', 'Join our team as a Front-End Developer in beautiful Portland, OR. We are looking for a skilled and enthusiastic individual to help us create innovative web solutions. Competitive salary and great benefits package available.', '$100K - $110K', 'Portland, OR', 6);
