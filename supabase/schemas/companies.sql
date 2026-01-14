@@ -5,5 +5,39 @@ create table public.companies (
   contact_email text not null,
   contact_phone text null,
   created_at timestamp with time zone not null default now(),
-  constraint companies_pkey primary key (id)
+  user_id uuid null,
+  constraint companies_pkey primary key (id),
+  constraint companies_user_id_fkey foreign KEY (user_id) references auth.users (id) on update CASCADE on delete CASCADE
 ) TABLESPACE pg_default;
+
+-- Enable Row Level Security
+ALTER TABLE public.companies ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies
+
+-- Allow anyone to view all companies
+CREATE POLICY "Anyone can view companies" ON public.companies
+  FOR SELECT
+  USING (true);
+
+-- Allow authenticated users to insert companies
+CREATE POLICY "Authenticated users can insert companies" ON public.companies
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+-- Allow users to update their own companies
+CREATE POLICY "Users can update their own companies" ON public.companies
+  FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- Allow users to delete their own companies
+CREATE POLICY "Users can delete their own companies" ON public.companies
+  FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Enable Realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE public.companies;
