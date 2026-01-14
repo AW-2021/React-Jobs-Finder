@@ -3,6 +3,7 @@ import { useLoaderData, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { supabase } from "../supabase-client";
 import { type Job, type Company } from "../lib/types";
+import { useAuth } from "../context/AuthContext";
 
 const initialJob = {
   title: "",
@@ -29,6 +30,7 @@ const AddJobPage = () => {
   const [companyId, setCompanyId] = useState<number | undefined>(undefined);
 
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const activeBtnStyle =
     "bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1.5 px-4 w-full focus:outline-none focus:shadow-outline";
@@ -43,7 +45,7 @@ const AddJobPage = () => {
     if (isCompanyNew) {
       const { data, error: companiesError } = await supabase
         .from("companies")
-        .insert(newCompany)
+        .insert({...newCompany, user_id: user?.id })
         .select()
         .single();
 
@@ -56,7 +58,7 @@ const AddJobPage = () => {
 
     const { error: jobsError } = await supabase
       .from("jobs")
-      .insert({ ...newJob, company_id })
+      .insert({ ...newJob, company_id, user_id: user?.id })
       .single();
 
     if (jobsError) {
@@ -67,10 +69,13 @@ const AddJobPage = () => {
     setNewJob(initialJob);
     setNewCompany(initialCompany);
     setCompanyId(undefined);
+    setIsCompanyNew(false);
 
     toast.success('Job Added Successfully!');
     return navigate("/jobs");
   };
+
+  console.log(companies)
 
   return (
     <section className="bg-indigo-50">
@@ -157,8 +162,8 @@ const AddJobPage = () => {
               <select
                 id="salary"
                 name="salary"
-                className="rounded w-full py-2 px-3"
                 required
+                className="rounded w-full py-2 px-3"
                 value={newJob.salary}
                 onChange={(e) =>
                   setNewJob((prev) => ({ ...prev, salary: e.target.value }))
@@ -189,9 +194,9 @@ const AddJobPage = () => {
                 type="text"
                 id="location"
                 name="location"
+                required
                 className="rounded w-full px-3 py-2 mb-2"
                 placeholder="Company Location"
-                required
                 value={newJob.location}
                 onChange={(e) =>
                   setNewJob((prev) => ({ ...prev, location: e.target.value }))
@@ -332,9 +337,12 @@ const AddJobPage = () => {
                   name="old_company"
                   required
                   className="rounded w-full py-2 px-3"
-                  value={companyId}
+                  value={companyId ?? ""}
                   onChange={(e) => setCompanyId(Number(e.target.value))}
                 >
+                  <option value="" disabled>
+                    Select a company
+                  </option>
                   {companies?.map((company) => (
                     <option key={company.id} value={company.id}>
                       {company.id}. {company.name}
@@ -360,9 +368,12 @@ const AddJobPage = () => {
 };
 
 const companiesLoader = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+
   const { error, data } = await supabase
     .from("companies")
     .select("*")
+    .eq("user_id", user?.id)
     .order("id", { ascending: true });
 
   if (error) {
