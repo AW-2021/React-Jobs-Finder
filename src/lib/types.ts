@@ -6,6 +6,7 @@ export interface Job {
   salary: string;
   location: string;
   created_at?: string;
+  user_id?: string;
 }
 
 export interface Company {
@@ -15,4 +16,5 @@ export interface Company {
   contact_email: string;
   contact_phone?: string;
   created_at?: string;
+  user_id?: string;
 }
