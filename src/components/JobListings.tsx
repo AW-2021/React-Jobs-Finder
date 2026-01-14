@@ -1,30 +1,9 @@
 import JobListing from "./JobListing";
 import Spinner from "./Spinner";
-import { useState, useEffect } from "react";
-import { type Job } from "../lib/types";
-import { supabase } from "../supabase-client";
+import { useRealtimeJobs } from "../hooks/useRealtimeJobs";
 
 const JobListings = ({ isHome = false }) => {
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const { error, data } = await supabase
-          .from("jobs")
-          .select("*")
-          .order("created_at", { ascending: true });
-        setJobs(data ?? []);
-      } catch (err: any) {
-        console.error("Error reading jobs", err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchJobs();
-  }, []);
+  const { jobs, loading } = useRealtimeJobs();
 
   return (
     <section className="bg-blue-50 px-4 py-10">
@@ -35,12 +14,16 @@ const JobListings = ({ isHome = false }) => {
 
         {loading ? (
           <Spinner loading={loading} />
-        ) : (
+        ) : jobs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {jobs.map((job) => (
-              <JobListing key={job.id} job={job} />
-            ))}
+            {isHome
+              ? jobs
+                  .slice(0, 6)
+                  .map((job) => <JobListing key={job.id} job={job} />)
+              : jobs.map((job) => <JobListing key={job.id} job={job} />)}
           </div>
+        ) : (
+          <p className="text-center font-semibold">No job openings. Check back soon!</p>
         )}
       </div>
     </section>
