@@ -7,9 +7,12 @@
     "salary" text not null,
     "location" text not null,
     "created_at" timestamp with time zone not null default now(),
-    "company_id" bigint not null
+    "company_id" bigint not null,
+    "user_id" uuid
       );
 
+
+alter table "public"."jobs" enable row level security;
 
 CREATE UNIQUE INDEX jobs_pkey ON public.jobs USING btree (id);
 
@@ -18,6 +21,10 @@ alter table "public"."jobs" add constraint "jobs_pkey" PRIMARY KEY using index "
 alter table "public"."jobs" add constraint "jobs_company_id_fkey" FOREIGN KEY (company_id) REFERENCES public.companies(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 
 alter table "public"."jobs" validate constraint "jobs_company_id_fkey";
+
+alter table "public"."jobs" add constraint "jobs_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+
+alter table "public"."jobs" validate constraint "jobs_user_id_fkey";
 
 grant delete on table "public"."jobs" to "anon";
 
@@ -60,5 +67,42 @@ grant trigger on table "public"."jobs" to "service_role";
 grant truncate on table "public"."jobs" to "service_role";
 
 grant update on table "public"."jobs" to "service_role";
+
+
+  create policy "Anyone can view jobs"
+  on "public"."jobs"
+  as permissive
+  for select
+  to public
+using (true);
+
+
+
+  create policy "Authenticated users can insert jobs"
+  on "public"."jobs"
+  as permissive
+  for insert
+  to authenticated
+with check ((auth.uid() = user_id));
+
+
+
+  create policy "Users can delete their own jobs"
+  on "public"."jobs"
+  as permissive
+  for delete
+  to authenticated
+using ((auth.uid() = user_id));
+
+
+
+  create policy "Users can update their own jobs"
+  on "public"."jobs"
+  as permissive
+  for update
+  to authenticated
+using ((auth.uid() = user_id))
+with check ((auth.uid() = user_id));
+
 
 
