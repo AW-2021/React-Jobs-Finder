@@ -1,32 +1,47 @@
-import { Link, NavLink } from "react-router-dom";
-import logo from '../assets/images/logo.png';
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import logo from "../assets/images/logo.png";
+import { useAuth } from "../context/AuthContext";
 
 interface LinkProps {
-    isActive: boolean;
+  isActive: boolean;
 }
 
 const Navbar = () => {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    try {
+      await signOut();
+      navigate("/");
+    } catch (err: any) {
+      console.error(err);
+    }
+  };
+
   const linkClass = ({ isActive }: LinkProps) => {
-    return isActive ? 'bg-black hover:bg-gray-900 rounded-md px-3 py-2' : 'hover:bg-gray-900 rounded-md px-3 py-2';
-  }
+    return isActive
+      ? "bg-black hover:bg-gray-900 rounded-md px-3 py-2"
+      : "hover:bg-gray-900 rounded-md px-3 py-2";
+  };
 
   return (
-    <nav className='bg-indigo-700 border-b border-indigo-500'>
-      <div className='mx-auto max-w-7xl px-2 sm:px-6 lg:px-8'>
-        <div className='flex h-20 items-center justify-between'>
-          <div className='flex flex-1 items-center justify-center md:items-stretch md:justify-start'>
+    <nav className="bg-indigo-700 border-b border-indigo-500">
+      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div className="flex h-20 items-center justify-between">
+          <div className="flex flex-1 items-center justify-center md:items-stretch md:justify-start">
             {/* LOGO */}
-            <Link to='/' className='flex shrink-0 items-center mr-4'>
-              <img 
-                src={logo} 
-                alt="React Jobs logo"
-                className='h-10 w-auto'
-              />
-              <span className='hidden md:block text-white text-2xl font-bold ml-2'>React Jobs</span>
+            <Link to="/home" className="flex shrink-0 items-center mr-4">
+              <img src={logo} alt="React Jobs logo" className="h-10 w-auto" />
+              <span className="hidden md:block text-white text-2xl font-bold ml-2">
+                React Jobs
+              </span>
             </Link>
-            <div className='md:ml-auto'>
-              <div className='flex space-x-2 text-white'>
-                <NavLink to="/" className={linkClass}>
+            <div className="md:ml-auto">
+              <div className="flex space-x-2 text-white">
+                <NavLink to="/home" className={linkClass}>
                   Home
                 </NavLink>
                 <NavLink to="/jobs" className={linkClass}>
@@ -35,13 +50,19 @@ const Navbar = () => {
                 <NavLink to="/add-job" className={linkClass}>
                   Add Job
                 </NavLink>
+                <button
+                  onClick={handleSignOut}
+                  className="hover:bg-gray-900 rounded-md px-3 py-2"
+                >
+                  Sign Out
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-     </nav>
-  )
-}
+    </nav>
+  );
+};
 
 export default Navbar;
