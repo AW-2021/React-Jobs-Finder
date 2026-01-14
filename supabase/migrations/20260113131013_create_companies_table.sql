@@ -5,13 +5,20 @@
     "description" text,
     "contact_email" text not null,
     "contact_phone" text,
-    "created_at" timestamp with time zone not null default now()
+    "created_at" timestamp with time zone not null default now(),
+    "user_id" uuid
       );
 
+
+alter table "public"."companies" enable row level security;
 
 CREATE UNIQUE INDEX companies_pkey ON public.companies USING btree (id);
 
 alter table "public"."companies" add constraint "companies_pkey" PRIMARY KEY using index "companies_pkey";
+
+alter table "public"."companies" add constraint "companies_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
+
+alter table "public"."companies" validate constraint "companies_user_id_fkey";
 
 grant delete on table "public"."companies" to "anon";
 
@@ -54,5 +61,42 @@ grant trigger on table "public"."companies" to "service_role";
 grant truncate on table "public"."companies" to "service_role";
 
 grant update on table "public"."companies" to "service_role";
+
+
+  create policy "Anyone can view companies"
+  on "public"."companies"
+  as permissive
+  for select
+  to public
+using (true);
+
+
+
+  create policy "Authenticated users can insert companies"
+  on "public"."companies"
+  as permissive
+  for insert
+  to authenticated
+with check ((auth.uid() = user_id));
+
+
+
+  create policy "Users can delete their own companies"
+  on "public"."companies"
+  as permissive
+  for delete
+  to authenticated
+using ((auth.uid() = user_id));
+
+
+
+  create policy "Users can update their own companies"
+  on "public"."companies"
+  as permissive
+  for update
+  to authenticated
+using ((auth.uid() = user_id))
+with check ((auth.uid() = user_id));
+
 
 
