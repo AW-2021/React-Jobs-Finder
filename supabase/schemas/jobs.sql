@@ -7,6 +7,43 @@ create table public.jobs (
   location text not null,
   created_at timestamp with time zone not null default now(),
   company_id bigint not null,
+  user_id uuid null,
   constraint jobs_pkey primary key (id),
-  constraint jobs_company_id_fkey foreign KEY (company_id) references companies (id) on update CASCADE on delete CASCADE
+  constraint jobs_company_id_fkey foreign KEY (company_id) references companies (id) on update CASCADE on delete CASCADE,
+  constraint jobs_user_id_fkey foreign KEY (user_id) references auth.users (id) on update CASCADE on delete CASCADE
 ) TABLESPACE pg_default;
+
+-- Enable Row Level Security
+ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies
+
+-- Allow anyone to view all jobs
+CREATE POLICY "Anyone can view jobs" ON public.jobs
+  FOR SELECT
+  USING (true);
+
+-- Allow authenticated users to insert jobs
+CREATE POLICY "Authenticated users can insert jobs" ON public.jobs
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+-- Allow users to update their own jobs
+CREATE POLICY "Users can update their own jobs" ON public.jobs
+  FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+-- Allow users to delete their own jobs
+CREATE POLICY "Users can delete their own jobs" ON public.jobs
+  FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+-- Enable replica identity for DELETE events to work properly
+ALTER TABLE jobs REPLICA IDENTITY FULL;
+
+-- Enable Realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
