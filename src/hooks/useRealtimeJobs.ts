@@ -43,7 +43,16 @@ export const useRealtimeJobs = () => {
             // console.log("Real-time update received:", payload);
 
             if (payload.eventType === "INSERT") {
-              setJobs((currentJobs) => [...currentJobs, payload.new as Job]);
+              setJobs((currentJobs) => {
+                // Check if job already exists to prevent duplicates
+                const jobExists = currentJobs.some(
+                  (job) => job.id === (payload.new as Job).id
+                );
+                if (jobExists) {
+                  return currentJobs;
+                }
+                return [...currentJobs, payload.new as Job];
+              });
             } else if (payload.eventType === "UPDATE") {
               setJobs((currentJobs) =>
                 currentJobs.map((job) =>
