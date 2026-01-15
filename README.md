@@ -74,25 +74,31 @@ A modern, full-stack job board application built with React, TypeScript, Tailwin
 
 ## Screenshots
 
-> Add screenshots of your application here
+> DESKTOP SCREENSHOTS 
 
 ### Sign In Page
-![Sign In Page](./screenshots/signin.png)
+![Sign In Page](./screenshots/desktop/signin.png)
+
+### Sign Up Page
+![Sign In Page](./screenshots/desktop/signup.png)
 
 ### Home Page
-![Home Page](./screenshots/home.png)
+![Home Page](./screenshots/desktop/home.png)
+
+### Navbar
+![Home Page](./screenshots/desktop/navbar.png)
 
 ### Job Listings
-![Job Listings](./screenshots/jobs.png)
+![Job Listings](./screenshots/desktop/jobs.png)
 
 ### Job Details
-![Job Details](./screenshots/job-detail.png)
+![Job Details](./screenshots/desktop/job-detail.png)
 
 ### Add Job Form
-![Add Job](./screenshots/add-job.png)
+![Add Job](./screenshots/desktop/add-job.png)
 
 ### Edit Job Form
-![Edit Job](./screenshots/edit-job.png)
+![Edit Job](./screenshots/desktop/edit-job.png)
 
 ---
 
@@ -343,7 +349,6 @@ React-Jobs-Finder/
 │   └── config.toml          # Supabase configuration
 ├── .env.local               # Environment variables (create this)
 ├── .gitignore
-├── CLAUDE.md                # Development guidelines for Claude Code
 ├── README.md
 ├── package.json
 ├── tsconfig.json
@@ -362,6 +367,7 @@ React-Jobs-Finder/
 | `description`  | text      | NULL                           | Company description          |
 | `contact_email`| text      | NOT NULL                       | Contact email address        |
 | `contact_phone`| text      | NULL                           | Contact phone number         |
+| `user_id`      | uuid      | NULL, FOREIGN KEY → auth.users(id), ON DELETE CASCADE | Owner of the company |
 | `created_at`   | timestamp | DEFAULT NOW()                  | Record creation timestamp    |
 
 ### Jobs Table
@@ -375,43 +381,55 @@ React-Jobs-Finder/
 | `salary`      | text      | NOT NULL                           | Salary information           |
 | `location`    | text      | NOT NULL                           | Job location                 |
 | `company_id`  | bigint    | FOREIGN KEY → companies(id), ON DELETE CASCADE | Reference to company |
+| `user_id`     | uuid      | NULL, FOREIGN KEY → auth.users(id), ON DELETE CASCADE | Owner of the job |
 | `created_at`  | timestamp | DEFAULT NOW()                      | Record creation timestamp    |
 
 ### Relationships
 
-- **One-to-Many**: One company can have many jobs
-- **Foreign Key Constraint**: `jobs.company_id` references `companies.id`
-- **Cascading Delete**: Deleting a company automatically deletes all associated jobs
+- **One-to-Many (Companies to Jobs)**: One company can have many jobs
+  - **Foreign Key**: `jobs.company_id` references `companies.id`
+  - **Cascading Delete**: Deleting a company automatically deletes all associated jobs
+
+- **One-to-Many (Users to Companies)**: One user can own many companies
+  - **Foreign Key**: `companies.user_id` references `auth.users(id)`
+  - **Cascading Delete**: Deleting a user automatically deletes all their companies
+
+- **One-to-Many (Users to Jobs)**: One user can own many jobs
+  - **Foreign Key**: `jobs.user_id` references `auth.users(id)`
+  - **Cascading Delete**: Deleting a user automatically deletes all their jobs
 
 ### Database Diagram
 
 ```
 ┌─────────────────────┐
-│     companies       │
+│   auth.users        │
+│  (Supabase Auth)    │
 ├─────────────────────┤
 │ id (PK)             │
-│ name                │
-│ description         │
-│ contact_email       │
-│ contact_phone       │
-│ created_at          │
+│ email               │
+│ ...                 │
 └─────────────────────┘
           │
-          │ 1:N
-          │
-          ▼
-┌─────────────────────┐
-│       jobs          │
-├─────────────────────┤
-│ id (PK)             │
-│ title               │
-│ type                │
-│ description         │
-│ salary              │
-│ location            │
-│ company_id (FK)     │
-│ created_at          │
-└─────────────────────┘
+          ├─────────────┐
+          │             │
+          │ 1:N         │ 1:N
+          │             │
+          ▼             ▼
+┌─────────────────────┐ ┌─────────────────────┐
+│     companies       │ │       jobs          │
+├─────────────────────┤ ├─────────────────────┤
+│ id (PK)             │ │ id (PK)             │
+│ name                │ │ title               │
+│ description         │ │ type                │
+│ contact_email       │ │ description         │
+│ contact_phone       │ │ salary              │
+│ user_id (FK)        │ │ location            │
+│ created_at          │ │ company_id (FK)     │
+└─────────────────────┘ │ user_id (FK)        │
+          │             │ created_at          │
+          │ 1:N         └─────────────────────┘
+          │                       ▲
+          └───────────────────────┘
 ```
 
 ## Key Features Explained
@@ -724,15 +742,6 @@ supabase gen types typescript --local > src/lib/database.types.ts
 - Review [React Router Documentation](https://reactrouter.com/en/main)
 - Open an issue on GitHub
 - Check existing issues for similar problems
-
----
-
-## Acknowledgments
-
-- Built with [React](https://react.dev/)
-- Powered by [Supabase](https://supabase.com/)
-- Styled with [Tailwind CSS](https://tailwindcss.com/)
-- Icons from [React Icons](https://react-icons.github.io/react-icons/)
 
 ---
 
